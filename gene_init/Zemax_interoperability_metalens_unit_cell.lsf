@@ -1,0 +1,44 @@
+###################################################################
+# Zemax_interop_metalens_unit_cell.lsf 
+#
+# This script finds the phase as a function of duty cycle and height.
+#
+# Copyright 2019 Lumerical Solutions Inc
+###################################################################
+
+sname = "radius";
+radius = getsweepdata(sname,"radius");
+S = getsweepresult(sname,"S");
+T = getsweepresult(sname,"T");
+nd = length(radius);
+
+## Phase in terms of duty cycle and height
+phase = pinch(angle(S.S21_Gn),1,1); # the dimension of S21_Gn is [frequency,radius,height]
+#image(radius*1e6, phase,"Radius (um)","Phase");
+#setplot("colorbar min",-pi); setplot("colorbar max",pi);
+
+
+## Transmission in terms of duty cycle and height
+#T0 = pinch(T.T_Gn,1,1); # the dimension of T_Gn is [frequency,radius,height]
+#image(radius*1e6,height*1e6,T0,"Radius (um)","Transmission");
+#setplot("colorbar min",0); setplot("colorbar max",1);
+
+# Phase for height = 1.3 um
+norm_phase  = pinch(unwrap(phase(:))-phase(1)); # normalized to the phase for lowest duty cycle
+#plot(radius*1e6,norm_phase,"Radius (um)","Phase (rad)","Height = "+num2str(height(hi)*1e6)+" (um)","linewidth=2");
+#setplot("show legend",false);
+
+## Transmission for height = 1.3 um
+#plot(radius,T0(:,hi),"Radius (um)"," Transmission","Height = "+num2str(height(hi)*1e6)+" (um)","linewidth=2");
+#setplot("y min",0);setplot("y max",1);setplot("show legend",false);
+
+# Save phase data at target wavelength
+wavelength = getnamed("s_params::source","center wavelength");
+period = getnamed("::model","period");
+mat_rectangle = getnamed("rectangle","material");
+index_rectangle = getnamed("rectangle","index");
+mat_sub = getnamed("substrate","material");
+index_sub = getnamed("substrate","index");
+?phase = norm_phase;
+
+savedata('phase_vs_radius',wavelength,period,mat_rectangle,index_rectangle,mat_sub,index_sub,phase,radius);

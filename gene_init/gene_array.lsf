@@ -1,0 +1,13 @@
+um = 1e-6;
+nm = 1e-9;
+theta = 10;
+lambda = 1550*nm;
+x_array = 10;
+period = 800*nm;
+gradient = sin(theta / 180 * pi) * 2 * pi/ lambda;
+phase_target = 1:10;
+loaddata("phase_vs_radius");
+phase_target = phase_target * gradient * period;
+phase_target  = phase_target  - min(phase_target );
+radius_mask = interp(radius,phase,phase_target);
+savedata("param",radius_mask);
