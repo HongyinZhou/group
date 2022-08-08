@@ -1,0 +1,78 @@
+FDTD Solutions Version 8.19.1584 (Windows 64bit)
+ expires (month/day/year): 12/31/2025
+using config file: C:/Users/zhy15/AppData/Roaming/Lumerical/FDTD Solutions.ini
+license host: <a href=http://localhost:8095>localhost:8095</a>
+current time: Sat Jul 30 13:47:02 2022
+Running on host: 拯救者
+All processes are communicating and ready to proceed to simulation...
+Running fsp file: C:\Program Files\Lumerical\FDTD\bin\fdtd-engine.exe -t 50 -remote -hide D:/inverse_design_metas_regular/gene_init/Zemax_interoperability_metalens_unit_cell_radius/radius_2.fsp
+number of processors is 1
+processors are distributed as: 1x1x1
+Running 3D Simulation
+Starting meshing
+Simulation size in gridpoints: 19 x 19 x 70
+Refined 0 mesh cells (0%)
+Completed meshing!
+Meshing complete in 0 seconds of CPU time
+0 0
+Starting meshing
+Simulation size in gridpoints: 19 x 19 x 70
+Refined 0 mesh cells (0%)
+Completed meshing!
+Meshing complete in 0 seconds of CPU time
+0 0
+Starting meshing
+Simulation size in gridpoints: 19 x 19 x 70
+Refined 0 mesh cells (0%)
+Completed meshing!
+Meshing complete in 0 seconds of CPU time
+0 0
+finished material properties
+Meshing Time: 0.0208575 seconds, Init Electrical Material Time: 0.0089723 seconds, Init Magnetic Material Time: 5.41e-005
+Using selected optimization level: 2
+Selecting 3d kernel for splitFieldDirection=0 and optLevel=2
+-----------------------------------------
+Beginning initialization of 3D Simulation
+Starting to add sources to simulation
+Adding 3D Gaussian source propagating in Z
+Starting to add boundary conditions to simulation
+Adding 3D Anti-Symmetric BC
+Adding 3D Anti-Symmetric BC
+Adding 3D Symmetric BC
+Adding 3D Symmetric BC
+Adding 3D PML BC
+Adding 3D PML BC
+Starting to add monitors to Simulation
+Adding analysis monitor
+Adding analysis monitor
+Adding 3D index monitor
+Adding 3D index monitor
+Adding 3D DFT monitor
+Adding 3D DFT monitor
+Adding 3D DFT monitor
+Finished initialization of 3D Simulation
+-----------------------------------------
+All processes are communicating and ready to proceed to simulation...
+Starting 223049 total iterations
+0% complete. Max time remaining: 1 min, 5 secs. Auto Shutoff: 1
+2% complete. Max time remaining: 1 min, 4 secs. Auto Shutoff: 0.00227802
+4% complete. Max time remaining: 1 min, 3 secs. Auto Shutoff: 0.000225646
+6% complete. Max time remaining: 1 min, 2 secs. Auto Shutoff: 3.86531e-005
+7% complete. Max time remaining: 1 min, 1 secs. Auto Shutoff: 2.31394e-005
+9% complete. Max time remaining: 59 secs. Auto Shutoff: 1.92629e-005
+11% complete. Max time remaining: 58 secs. Auto Shutoff: 1.30048e-005
+12% complete. Max time remaining: 57 secs. Auto Shutoff: 9.9018e-006
+100% complete. Max time remaining: 0 mins, 0 secs. Auto Shutoff: 9.9018e-006
+Early termination of simulation, the autoshutoff criteria are satisfied.
+Completed 27664 iterations, or 6.201317e-013s of Simulation Time
+Process 0 starting to collect data
+    collecting monitor data
+    collecting source data
+Finished collecting data
+Simulation completed successfully at: Sat Jul 30 13:47:10 2022
+Overall wall time measurements in seconds:
+    time to mesh and initialize: 0
+    time to run FDTD simulation: 8
+    time to finalize data and save to files: 0
+    FDTD solver speed: 87.3837 Mnodes/s
+    total FDTD solver speed on 1 processes: 87.3837 Mnodes/s

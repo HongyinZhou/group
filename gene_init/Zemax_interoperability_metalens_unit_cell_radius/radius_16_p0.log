@@ -1,0 +1,106 @@
+FDTD Solutions Version 8.19.1584 (Windows 64bit)
+ expires (month/day/year): 12/31/2025
+using config file: C:/Users/zhy15/AppData/Roaming/Lumerical/FDTD Solutions.ini
+license host: <a href=http://localhost:8095>localhost:8095</a>
+current time: Sat Jul 30 13:50:34 2022
+Running on host: 拯救者
+All processes are communicating and ready to proceed to simulation...
+Running fsp file: C:\Program Files\Lumerical\FDTD\bin\fdtd-engine.exe -t 50 -remote -hide D:/inverse_design_metas_regular/gene_init/Zemax_interoperability_metalens_unit_cell_radius/radius_16.fsp
+number of processors is 1
+processors are distributed as: 1x1x1
+Running 3D Simulation
+Starting meshing
+Simulation size in gridpoints: 31 x 31 x 70
+Refined 0 mesh cells (0%)
+Completed meshing!
+Meshing complete in 0.109375 seconds of CPU time
+0 0
+Starting meshing
+Simulation size in gridpoints: 31 x 31 x 70
+Refined 0 mesh cells (0%)
+Completed meshing!
+Meshing complete in 0.15625 seconds of CPU time
+0 0
+Starting meshing
+Simulation size in gridpoints: 31 x 31 x 70
+Refined 0 mesh cells (0%)
+Completed meshing!
+Meshing complete in 0.265625 seconds of CPU time
+0 0
+finished material properties
+Meshing Time: 0.0494861 seconds, Init Electrical Material Time: 0.0169959 seconds, Init Magnetic Material Time: 0.0001637
+Using selected optimization level: 2
+Selecting 3d kernel for splitFieldDirection=0 and optLevel=2
+-----------------------------------------
+Beginning initialization of 3D Simulation
+Starting to add sources to simulation
+Adding 3D Gaussian source propagating in Z
+Starting to add boundary conditions to simulation
+Adding 3D Anti-Symmetric BC
+Adding 3D Anti-Symmetric BC
+Adding 3D Symmetric BC
+Adding 3D Symmetric BC
+Adding 3D PML BC
+Adding 3D PML BC
+Starting to add monitors to Simulation
+Adding analysis monitor
+Adding analysis monitor
+Adding 3D index monitor
+Adding 3D index monitor
+Adding 3D DFT monitor
+Adding 3D DFT monitor
+Adding 3D DFT monitor
+Finished initialization of 3D Simulation
+-----------------------------------------
+All processes are communicating and ready to proceed to simulation...
+Starting 227890 total iterations
+0% complete. Max time remaining: 2 mins, 6 secs. Auto Shutoff: 1
+2% complete. Max time remaining: 1 min, 55 secs. Auto Shutoff: 0.110572
+3% complete. Max time remaining: 1 min, 54 secs. Auto Shutoff: 0.0638757
+4% complete. Max time remaining: 1 min, 53 secs. Auto Shutoff: 0.0328144
+4% complete. Max time remaining: 1 min, 52 secs. Auto Shutoff: 0.0114644
+5% complete. Max time remaining: 1 min, 51 secs. Auto Shutoff: 0.0118318
+6% complete. Max time remaining: 1 min, 50 secs. Auto Shutoff: 0.014595
+7% complete. Max time remaining: 1 min, 50 secs. Auto Shutoff: 0.00836686
+8% complete. Max time remaining: 1 min, 49 secs. Auto Shutoff: 0.00287018
+10% complete. Max time remaining: 1 min, 47 secs. Auto Shutoff: 0.00429615
+11% complete. Max time remaining: 1 min, 46 secs. Auto Shutoff: 0.00199066
+12% complete. Max time remaining: 1 min, 45 secs. Auto Shutoff: 0.000946192
+13% complete. Max time remaining: 1 min, 44 secs. Auto Shutoff: 0.00136278
+13% complete. Max time remaining: 1 min, 43 secs. Auto Shutoff: 0.00153664
+14% complete. Max time remaining: 1 min, 41 secs. Auto Shutoff: 0.000877877
+15% complete. Max time remaining: 1 min, 40 secs. Auto Shutoff: 0.000521151
+16% complete. Max time remaining: 1 min, 39 secs. Auto Shutoff: 0.000810377
+17% complete. Max time remaining: 1 min, 38 secs. Auto Shutoff: 0.000748953
+19% complete. Max time remaining: 1 min, 36 secs. Auto Shutoff: 0.000321631
+20% complete. Max time remaining: 1 min, 35 secs. Auto Shutoff: 0.000413943
+21% complete. Max time remaining: 1 min, 34 secs. Auto Shutoff: 0.000320735
+22% complete. Max time remaining: 1 min, 33 secs. Auto Shutoff: 0.00016546
+22% complete. Max time remaining: 1 min, 32 secs. Auto Shutoff: 0.000140464
+23% complete. Max time remaining: 1 min, 31 secs. Auto Shutoff: 0.000174369
+24% complete. Max time remaining: 1 min, 30 secs. Auto Shutoff: 0.000100466
+25% complete. Max time remaining: 1 min, 29 secs. Auto Shutoff: 5.49079e-005
+26% complete. Max time remaining: 1 min, 28 secs. Auto Shutoff: 5.60905e-005
+28% complete. Max time remaining: 1 min, 26 secs. Auto Shutoff: 3.66867e-005
+29% complete. Max time remaining: 1 min, 25 secs. Auto Shutoff: 2.26861e-005
+30% complete. Max time remaining: 1 min, 24 secs. Auto Shutoff: 2.72495e-005
+31% complete. Max time remaining: 1 min, 23 secs. Auto Shutoff: 2.3265e-005
+31% complete. Max time remaining: 1 min, 22 secs. Auto Shutoff: 1.72685e-005
+32% complete. Max time remaining: 1 min, 21 secs. Auto Shutoff: 1.54934e-005
+33% complete. Max time remaining: 1 min, 19 secs. Auto Shutoff: 1.63694e-005
+34% complete. Max time remaining: 1 min, 18 secs. Auto Shutoff: 1.31379e-005
+35% complete. Max time remaining: 1 min, 17 secs. Auto Shutoff: 1.21126e-005
+100% complete. Max time remaining: 0 mins, 0 secs. Auto Shutoff: 9.03415e-006
+Early termination of simulation, the autoshutoff criteria are satisfied.
+Completed 80511 iterations, or 1.766441e-012s of Simulation Time
+Process 0 starting to collect data
+    collecting monitor data
+    collecting source data
+Finished collecting data
+Simulation completed successfully at: Sat Jul 30 13:51:16 2022
+Overall wall time measurements in seconds:
+    time to mesh and initialize: 0
+    time to run FDTD simulation: 42
+    time to finalize data and save to files: 0
+    FDTD solver speed: 128.952 Mnodes/s
+    total FDTD solver speed on 1 processes: 128.952 Mnodes/s
