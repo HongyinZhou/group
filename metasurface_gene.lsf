@@ -1,0 +1,436 @@
+switchtolayout;
+selectall; 
+delete; 
+
+#matlabload("epoch.mat");
+matlabload("all_parameters.mat");
+base_path = selpath;
+addstructuregroup;
+set("name","meta_array");
+nm=1e-9;
+um=1e-6;
+x_location = lambda_ele/2:lambda_ele:(x_array-0.5)*lambda_ele;
+y_location = lambda_ele*(y_array-0.5):-lambda_ele:lambda_ele/2;
+x_substrate = x_array*lambda_ele + space * 2;
+y_substrate = y_array*lambda_ele + space * 2;
+x_location_list = x_location - (x_array*lambda_ele)/2;
+y_location_list = y_location - (y_array*lambda_ele)/2;
+space_z = 2.5 * space;
+for(ii = 1:y_array){
+    for(jj = 1:x_array){
+        if(shape_ele == true){
+                addrect;
+                order = jj + (ii - 1) * y_array;
+                name = "element" + num2str(order);
+                set("name",name);
+                set("x span",param_design(order));
+                set("y span",param_design(order));
+                set("x",x_location_list(jj));
+                set("y",y_location_list(ii));
+                set("z max", h_element);
+                set("z min", 0);
+                set("material","Si (Silicon) - Palik");
+                addtogroup("meta_array");
+                            
+          }else{
+                addcircle;
+                order = jj + (ii - 1) * y_array;
+                name = "element" + num2str(order);
+                set("name",name);
+                set("x",x_location_list(jj));
+                set("y",y_location_list(ii));
+                set("z max", h_element);
+                set("z min", 0);
+                set("radius", param_design(order));
+                #set("material","Si (Silicon) - Palik");
+                addtogroup("meta_array");      
+          }
+        }
+    }
+
+addrect; #substrate
+set("name","substrate");
+set("x span",x_substrate);
+set("y span",y_substrate);
+set("x", 0);
+set("y", 0);
+set("z max", 0);
+set("z min", -h_substrate);
+set("material","SiO2 (Glass) - Palik");
+
+#addFDTD
+addfdtd;
+set("x",0);
+set("y",0);
+set("z",0);
+set("z min",-(h_substrate * 3 / 4));
+set("z max",h_element + space_z);
+set("x span",x_substrate - space);
+set("y span",y_substrate - space);
+set("simulation time",5e-13);
+set("mesh accuracy",mesh_accuracy);
+if(flag == 0){
+    set("x min bc",3);
+    set("x max bc",3);
+    set("y min bc",3);
+    set("y max bc",3);
+    }else{
+        set("x min bc",6);
+        set("x max bc",6);
+        set("y min bc",6);
+        set("y max bc",6);
+        
+        
+        
+        }
+resolution_mesh = mesh_accuracy_meta;
+for(ii = 1 : x_array * y_array){
+    addmesh;
+    name = "element" + num2str(ii);
+    set("name", name);
+    set("set maximum mesh step", 1);
+    set("override x mesh", 1);
+    set("override y mesh", 1);
+    set("override z mesh", 1);
+    set("dx", resolution_mesh);
+    set("dy", resolution_mesh);
+    set("dz", resolution_mesh);	
+    set("based on a structure", 1);
+    set("structure", name);
+}
+
+type_source = "add"+type_beam + ";";
+#addsource(forward field)
+if(flag == 0){
+    eval(type_source);
+    set("x",0);
+    set("y",0);
+    set("z",-h_substrate / 2);
+    set("direction","forward");
+    if(type_beam != "dipole"){
+        set("injection axis","z");
+        }
+    if(type_beam == "plane"){
+        set("wavelength start",lambda);
+        set("wavelength stop",lambda);
+        set("x span",x_substrate - space);
+        set("y span",y_substrate - space);  
+        }
+    if(type_beam == "gaussian"){
+        set("use scalar approximation",1);
+        set("waist radius w0",w0);
+        set("distance from waist",distance); 
+        }
+}else{
+    #addsource(backward field)
+
+
+
+    eval(type_source);
+    set("x",0);
+    set("y",0);
+    set("z",h_element + space_z - space * 0.5);
+    set("direction","backward");
+    set("angle theta",theta);
+    set("angle phi",phi);
+    if(type_beam != "dipole"){
+        set("injection axis","z");
+        }
+    if(type_beam == "plane"){
+        set("wavelength start",lambda);
+        set("wavelength stop",lambda);
+        set("x span",x_substrate - space);
+        set("y span",y_substrate - space);   
+        }
+    if(type_beam == "gaussian"){
+        set("use scalar approximation",1);
+        set("waist radius w0",w0);
+        set("distance from waist",distance);    
+    
+        }   
+}
+#addmonitor(extracted for updating the structure)
+#   the order of the boundary                 
+#                    list2
+#                 -----------
+#                 |         |
+#           list1 |         | list3
+#                 |         |
+#                 -----------
+#                    list4
+#               1→2→3→
+#                     ↓
+#                ←←←←←
+#                ↓
+#                →4→5→6
+
+#using a two-sided linear fit approach to get meta-atom boundaries fields
+mesh_x = getresult("FDTD", "x");
+mesh_y = getresult("FDTD", "y");
+mesh_z = getresult("FDTD", "z");
+near_bound = matrix(x_array * y_array, 4 * 4);
+for(ii = 1:x_array * y_array){
+    current_width = param_design(ii);
+    row = floor((ii-1)/x_array);
+    col = ii - x_array * row;
+    center_coord = [x_location_list(col), y_location_list(row + 1)];
+    boundaries_coord = [center_coord(1) - current_width/2,
+                        center_coord(2) + current_width/2,
+                        center_coord(1) + current_width/2,
+                        center_coord(2) - current_width/2];
+                        
+    #near_bound(ii, [1:4,9:12]) = find(mesh_x,[boundaries_coord(1), boundaries_coord(3)]);
+    near_bound13 = find(mesh_x,[boundaries_coord(1), boundaries_coord(3)]);
+    near_bound24 = find(mesh_y,[boundaries_coord(2), boundaries_coord(4)]);
+    if(mesh_x(near_bound13(1)) >= boundaries_coord(1)){
+        near_bound(ii,1:4) = mesh_x(near_bound13(1) - 2 : near_bound13(1) + 1);
+        }else{
+        near_bound(ii,1:4) = mesh_x(near_bound13(1) - 1 : near_bound13(1) + 2);}
+        
+    if(mesh_x(near_bound13(2)) >= boundaries_coord(3)){
+        near_bound(ii,9:12) = mesh_x(near_bound13(2) - 2 : near_bound13(2) + 1);
+        }else{
+        near_bound(ii,9:12) = mesh_x(near_bound13(2) - 1 : near_bound13(2) + 2);}
+        
+    if(mesh_y(near_bound24(1)) >= boundaries_coord(2)){
+        near_bound(ii,5:8) = mesh_y(near_bound24(1) - 2 : near_bound24(1) + 1);
+        }else{
+        near_bound(ii,5:8) = mesh_y(near_bound24(1) - 1 : near_bound24(1) + 2);}
+        
+    if(mesh_y(near_bound24(2)) >= boundaries_coord(4)){
+        near_bound(ii,13:16) = mesh_y(near_bound24(2) - 2 : near_bound24(2) + 1);
+        }else{
+        near_bound(ii,13:16) = mesh_y(near_bound24(2) - 1 : near_bound24(2) + 2);}
+        
+    }
+for(ii = 1:y_array){
+        for(jj = 1:x_array){
+            for(kk = 1 : 4){
+            order = jj + (ii - 1) * y_array;
+            current_width = param_design(order);
+            addpower;
+            sub_name = "adjoint_data" + num2str(order) + "_";
+            name = sub_name + num2str(1)+ "_" + num2str(kk);
+            set("monitor type",5);  # 2D x-normal
+            set("name",name);
+            set("y span",current_width);
+            set("z span",h_element);
+            set("y",y_location_list(ii));
+            set("z",h_element/2);
+            set("x", near_bound(order,kk));
+            
+            addpower;
+            name = sub_name + num2str(2)+ "_" + num2str(kk);
+            set("monitor type",6);  # 2D y-normal
+            set("name",name);
+            set("x max", near_bound(order,10)-mesh_accuracy_meta/10);
+            set("x min", near_bound(order,3)+mesh_accuracy_meta/10);
+            set("z span",h_element);
+            set("z",h_element/2);
+            set("y", near_bound(order,4 + kk));
+            
+            addpower;
+            name = sub_name + num2str(3)+ "_" + num2str(kk);
+            set("monitor type",5);  # 2D x-normal
+            set("name",name);
+            set("y span",current_width);
+            set("z span",h_element);
+            set("y",y_location_list(ii));
+            set("z",h_element/2);
+            set("x", near_bound(order,8 + kk));
+            
+            addpower;
+            name = sub_name + num2str(4)+ "_" + num2str(kk);
+            set("monitor type",6);  # 2D y-normal
+            set("name",name);
+            set("x max", near_bound(order,10)-mesh_accuracy_meta/10);
+            set("x min", near_bound(order,3)+mesh_accuracy_meta/10);
+            set("z span",h_element);
+            set("z",h_element/2);
+            set("y", near_bound(order,12 + kk));
+            }
+            }
+        }
+
+#addmonitor(calculating the forward field profile)
+
+if(flag == 0){
+    addpower;
+    set("name","forward_field");
+    set("monitor type",7);  # 2D z-normal
+    set("x",0);
+    set("x span",x_substrate - space);
+    set("y",0);
+    set("y span",y_substrate - space);
+    set("z",h_element + space_z - space * 0.5);
+}
+
+file_name= "metasurface_" + num2str(i) + "_" + num2str(flag) + ".fsp";
+#eval("")
+save(file_name);
+run;
+#generate locations to extract field data
+
+for(ii = 1:x_array*y_array){
+    current_width = param_design(ii);
+    row = floor((ii-1)/x_array);
+    col = ii - x_array * row;
+    sub_path = "adjoint_data" + num2str(ii) + "_";
+    folder_path = base_path + "\electrc_field_profile_flag_" + num2str(flag);
+    temp1 = getdata(sub_path + "1_1", "Ez");
+    temp2 = getdata(sub_path + "1_2", "Ez");
+    temp3 = getdata(sub_path + "1_3", "Ez");
+    temp4 = getdata(sub_path + "1_4", "Ez");
+    x0 = x_location_list(col) - current_width/2;
+    x1 = near_bound(ii,3);
+    x_1 = near_bound(ii,2);
+    x2 = near_bound(ii,4);
+    x_2 = near_bound(ii,1);
+    C_out = (x0-x_2) / (x_1 - x_2)* temp2
+           -(x0-x_1) / (x_1 - x_2)* temp1;
+    C_in = (x0-x1) / (x2 - x1)* temp4
+          -(x0-x2) / (x2 - x1)* temp3;
+    C_x0 = abs((x0 - x1)/(x1 - x_1))*C_out + abs((x0 - x_1)/(x1 - x_1))*C_in;
+    filename = folder_path + "\Ez_list" + "_" + sub_path + num2str(1);
+    matlabsave(filename,C_x0);
+            
+            
+    temp1 = getdata(sub_path + "2_1", "Ez");
+    temp2 = getdata(sub_path + "2_2", "Ez");
+    temp3 = getdata(sub_path + "2_3", "Ez");
+    temp4 = getdata(sub_path + "2_4", "Ez");
+    x0 = y_location_list(row+1) + current_width/2;
+    y1 = near_bound(ii,7);
+    x_1 = near_bound(ii,6);
+    x2 = near_bound(ii,8);
+    x_2 = near_bound(ii,5);
+    C_out = (x0-x1) / (x2 - x1)* temp4
+           -(x0-x2) / (x2 - x1)* temp3;
+    C_in = (x0-x_2) / (x_1 - x_2)* temp2
+          -(x0-x_1) / (x_1 - x_2)* temp1;
+    C_x0 = abs((x0 - x_1)/(x1 - x_1))*C_out + abs((x0 - x1)/(x1 - x_1))*C_in;
+    filename = folder_path + "\Ez_list" + "_" + sub_path + num2str(2);
+    matlabsave(filename,C_x0);
+    
+    temp1 = getdata(sub_path + "3_1", "Ez");
+    temp2 = getdata(sub_path + "3_2", "Ez");
+    temp3 = getdata(sub_path + "3_3", "Ez");
+    temp4 = getdata(sub_path + "3_4", "Ez");
+    x0 = x_location_list(col) + current_width/2;
+    x1 = near_bound(ii,11);
+    x_1 = near_bound(ii,10);
+    x2 = near_bound(ii,12);
+    x_2 = near_bound(ii,9);
+    C_out = (x0-x1) / (x2 - x1)* temp4
+           -(x0-x2) / (x2 - x1)* temp3;
+    C_in = (x0-x_2) / (x_1 - x_2)* temp2
+          -(x0-x_1) / (x_1 - x_2)* temp1;
+    C_x0 = abs((x0 - x_1)/(x1 - x_1))*C_out + abs((x0 - x1)/(x1 - x_1))*C_in;
+    filename = folder_path + "\Ez_list" + "_" + sub_path + num2str(3);
+    matlabsave(filename,C_x0);
+       
+    temp1 = getdata(sub_path + "4_1", "Ez");
+    temp2 = getdata(sub_path + "4_2", "Ez");
+    temp3 = getdata(sub_path + "4_3", "Ez");
+    temp4 = getdata(sub_path + "4_4", "Ez");
+    x0 = y_location_list(row + 1) - current_width/2;
+    x1 = near_bound(ii,15);
+    x_1 = near_bound(ii,14);
+    x2 = near_bound(ii,16);
+    x_2 = near_bound(ii,13);
+    C_out = (x0-x_2) / (x_1 - x_2)* temp2
+           -(x0-x_1) / (x_1 - x_2)* temp1;
+    C_in = (x0-x1) / (x2 - x1)* temp4
+          -(x0-x2) / (x2 - x1)* temp3;
+    C_x0 = abs((x0 - x1)/(x1 - x_1))*C_out + abs((x0 - x_1)/(x1 - x_1))*C_in;
+    filename = folder_path + "\Ez_list" + "_" + sub_path + num2str(4);
+    matlabsave(filename,C_x0);
+           
+        }
+for(ii = 1:x_array*y_array){
+    current_width = param_design(ii);
+    row = floor((ii-1)/x_array);
+    col = ii - x_array * row;
+    sub_path = "adjoint_data" + num2str(ii) + "_";
+    folder_path = base_path + "\electrc_field_profile_flag_" + num2str(flag);
+    temp1 = getdata(sub_path + "1_1", "Ex");
+    temp2 = getdata(sub_path + "1_2", "Ex");
+    temp3 = getdata(sub_path + "1_3", "Ex");
+    temp4 = getdata(sub_path + "1_4", "Ex");
+    x0 = x_location_list(col) - current_width/2;
+    x1 = near_bound(ii,3);
+    x_1 = near_bound(ii,2);
+    x2 = near_bound(ii,4);
+    x_2 = near_bound(ii,1);
+    C_out = (x0-x_2) / (x_1 - x_2)* temp2
+           -(x0-x_1) / (x_1 - x_2)* temp1;
+    C_in = (x0-x1) / (x2 - x1)* temp4
+          -(x0-x2) / (x2 - x1)* temp3;
+    C_x0 = abs((x0 - x1)/(x1 - x_1))*C_out + abs((x0 - x_1)/(x1 - x_1))*C_in;
+    filename = folder_path + "\D_list" + "_" + sub_path + num2str(1);
+    matlabsave(filename,C_x0);
+    
+    temp1 = getdata(sub_path + "3_1", "Ex");
+    temp2 = getdata(sub_path + "3_2", "Ex");
+    temp3 = getdata(sub_path + "3_3", "Ex");
+    temp4 = getdata(sub_path + "3_4", "Ex");
+    x0 = x_location_list(col) + current_width/2;
+    x1 = near_bound(ii,11);
+    x_1 = near_bound(ii,10);
+    x2 = near_bound(ii,12);
+    x_2 = near_bound(ii,9);
+    C_out = (x0-x1) / (x2 - x1)* temp4
+           -(x0-x2) / (x2 - x1)* temp3;
+    C_in = (x0-x_2) / (x_1 - x_2)* temp2
+          -(x0-x_1) / (x_1 - x_2)* temp1;
+    C_x0 = abs((x0 - x_1)/(x1 - x_1))*C_out + abs((x0 - x1)/(x1 - x_1))*C_in;
+    filename = folder_path + "\D_list" + "_" + sub_path + num2str(3);
+    matlabsave(filename,C_x0);
+        }
+for(ii = 1:x_array*y_array){
+    current_width = param_design(ii);
+    row = floor((ii-1)/x_array);
+    col = ii - x_array * row;
+    sub_path = "adjoint_data" + num2str(ii) + "_";
+    folder_path = base_path + "\electrc_field_profile_flag_" + num2str(flag);
+    temp1 = getdata(sub_path + "2_1", "Ey");
+    temp2 = getdata(sub_path + "2_2", "Ey");
+    temp3 = getdata(sub_path + "2_3", "Ey");
+    temp4 = getdata(sub_path + "2_4", "Ey");
+    x0 = y_location_list(row+1) + current_width/2;
+    y1 = near_bound(ii,7);
+    x_1 = near_bound(ii,6);
+    x2 = near_bound(ii,8);
+    x_2 = near_bound(ii,5);
+    C_out = (x0-x1) / (x2 - x1)* temp4
+           -(x0-x2) / (x2 - x1)* temp3;
+    C_in = (x0-x_2) / (x_1 - x_2)* temp2
+          -(x0-x_1) / (x_1 - x_2)* temp1;
+    C_x0 = abs((x0 - x_1)/(x1 - x_1))*C_out + abs((x0 - x1)/(x1 - x_1))*C_in;
+    filename = folder_path + "\D_list" + "_" + sub_path + num2str(2);
+    matlabsave(filename,C_x0);
+    
+    temp1 = getdata(sub_path + "4_1", "Ey");
+    temp2 = getdata(sub_path + "4_2", "Ey");
+    temp3 = getdata(sub_path + "4_3", "Ey");
+    temp4 = getdata(sub_path + "4_4", "Ey");
+    x0 = y_location_list(row + 1) - current_width/2;
+    x1 = near_bound(ii,15);
+    x_1 = near_bound(ii,14);
+    x2 = near_bound(ii,16);
+    x_2 = near_bound(ii,13);
+    C_out = (x0-x_2) / (x_1 - x_2)* temp2
+           -(x0-x_1) / (x_1 - x_2)* temp1;
+    C_in = (x0-x1) / (x2 - x1)* temp4
+          -(x0-x2) / (x2 - x1)* temp3;
+    C_x0 = abs((x0 - x1)/(x1 - x_1))*C_out + abs((x0 - x_1)/(x1 - x_1))*C_in;
+    filename = folder_path + "\D_list" + "_" + sub_path + num2str(4);
+    matlabsave(filename,C_x0);
+        }
+
+if(flag == 1){
+    eval(code_back);
+    }
+if(flag == 0){
+    eval(code_for);
+    }
