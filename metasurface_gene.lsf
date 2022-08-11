@@ -69,20 +69,11 @@ set("x span",x_substrate - space);
 set("y span",y_substrate - space);
 set("simulation time",5e-13);
 set("mesh accuracy",mesh_accuracy);
-if(flag == 0){
-    set("x min bc",3);
-    set("x max bc",3);
-    set("y min bc",3);
-    set("y max bc",3);
-    }else{
-        set("x min bc",6);
-        set("x max bc",6);
-        set("y min bc",6);
-        set("y max bc",6);
-        
-        
-        
-        }
+set("x min bc",5);
+set("x max bc",1);
+set("y min bc",4);
+set("y max bc",1);
+
 resolution_mesh = mesh_accuracy_meta;
 for(ii = 1 : x_array * y_array){
     addmesh;
@@ -99,55 +90,36 @@ for(ii = 1 : x_array * y_array){
     set("structure", name);
 }
 
-type_source = "add"+type_beam + ";";
 #addsource(forward field)
 if(flag == 0){
-    eval(type_source);
+    addplane;
     set("x",0);
     set("y",0);
     set("z",-h_substrate / 2);
+    set("injection axis","z");
     set("direction","forward");
-    if(type_beam != "dipole"){
-        set("injection axis","z");
-        }
-    if(type_beam == "plane"){
-        set("wavelength start",lambda);
-        set("wavelength stop",lambda);
-        set("x span",x_substrate - space);
-        set("y span",y_substrate - space);  
-        }
-    if(type_beam == "gaussian"){
-        set("use scalar approximation",1);
-        set("waist radius w0",w0);
-        set("distance from waist",distance); 
-        }
+    set("wavelength start",lambda);
+    set("wavelength stop",lambda);
+    set("x span",x_substrate - space);
+    set("y span",y_substrate - space);  
 }else{
     #addsource(backward field)
 
 
 
-    eval(type_source);
+    #eval(type_source);
+    addimportedsource;
+    set("name", "backfield");
+    select("backfield");
+    importdataset("EMMMM.mat");
     set("x",0);
     set("y",0);
     set("z",h_element + space_z - space * 0.5);
+    set("override global source settings",1);
+    set("wavelength start",1.55*um);
+    set("wavelength stop",1.55*um);
     set("direction","backward");
-    set("angle theta",theta);
-    set("angle phi",phi);
-    if(type_beam != "dipole"){
-        set("injection axis","z");
-        }
-    if(type_beam == "plane"){
-        set("wavelength start",lambda);
-        set("wavelength stop",lambda);
-        set("x span",x_substrate - space);
-        set("y span",y_substrate - space);   
-        }
-    if(type_beam == "gaussian"){
-        set("use scalar approximation",1);
-        set("waist radius w0",w0);
-        set("distance from waist",distance);    
-    
-        }   
+    set("injection axis","z");
 }
 #addmonitor(extracted for updating the structure)
 #   the order of the boundary                 
@@ -428,9 +400,6 @@ for(ii = 1:x_array*y_array){
     matlabsave(filename,C_x0);
         }
 
-if(flag == 1){
-    eval(code_back);
-    }
-if(flag == 0){
-    eval(code_for);
-    }
+
+if(flag == 0){eval(code_for);}
+
