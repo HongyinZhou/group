@@ -54,9 +54,9 @@ set("x span",x_substrate - space);
 set("y span",y_substrate - space);
 set("simulation time",5e-13);
 set("mesh accuracy",mesh_accuracy);
-set("x min bc",5);
+set("x min bc",1);
 set("x max bc",1);
-set("y min bc",4);
+set("y min bc",1);
 set("y max bc",1);
 
 resolution_mesh = mesh_accuracy_meta;
