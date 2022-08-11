@@ -164,10 +164,8 @@ for i = 1:Nsteps
     flag = 1;
     save(parameter_name, 'flag', 'h_air', 'h_element','h_substrate',...
     'index_nano', 'lambda', 'lambda_ele','Nsteps', 'param_design',...
-    'space', 'x_array', 'y_array', 'i','selpath', 'mesh_accuracy','mesh_accuracy_meta');
-    if strcmp(type_beam,'gaussian')
-        save(parameter_name,'w0','distance','-append');
-    end
+    'space', 'x_array', 'y_array', 'i','selpath', 'mesh_accuracy',...
+    'mesh_accuracy_meta');
     surface_fdtd = appopen('fdtd');
     code=strcat('metasurface_gene;');
     appevalscript(surface_fdtd, code);
