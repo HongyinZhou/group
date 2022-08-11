@@ -2,7 +2,6 @@ clc;
 clear;
 global x_array
 global y_array
-global shape_ele
 global lambda_ele
 global h_element
 global space
