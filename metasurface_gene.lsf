@@ -18,33 +18,18 @@ y_location_list = y_location - (y_array*lambda_ele)/2;
 space_z = 2.5 * space;
 for(ii = 1:y_array){
     for(jj = 1:x_array){
-        if(shape_ele == true){
-                addrect;
-                order = jj + (ii - 1) * y_array;
-                name = "element" + num2str(order);
-                set("name",name);
-                set("x span",param_design(order));
-                set("y span",param_design(order));
-                set("x",x_location_list(jj));
-                set("y",y_location_list(ii));
-                set("z max", h_element);
-                set("z min", 0);
-                set("material","Si (Silicon) - Palik");
-                addtogroup("meta_array");
-                            
-          }else{
-                addcircle;
-                order = jj + (ii - 1) * y_array;
-                name = "element" + num2str(order);
-                set("name",name);
-                set("x",x_location_list(jj));
-                set("y",y_location_list(ii));
-                set("z max", h_element);
-                set("z min", 0);
-                set("radius", param_design(order));
-                #set("material","Si (Silicon) - Palik");
-                addtogroup("meta_array");      
-          }
+        addrect;
+        order = jj + (ii - 1) * y_array;
+        name = "element" + num2str(order);
+        set("name",name);
+        set("x span",param_design(order));
+        set("y span",param_design(order));
+        set("x",x_location_list(jj));
+        set("y",y_location_list(ii));
+        set("z max", h_element);
+        set("z min", 0);
+        set("material","Si (Silicon) - Palik");
+        addtogroup("meta_array");
         }
     }
 
